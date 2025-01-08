@@ -1,0 +1,96 @@
+-----------------------------------------------------------------------------
+Wrong Code:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE *file;
+    char buffer[100];
+
+    // Attempt to open a file in read mode (the file does not exist)
+    file = fopen("file.txt", "w");
+    if (file == NULL) {
+        // Warning: File opening failed but we continue                       
+        printf("Error: Could not open file.\n");
+    }                                                                                                                                         
+  // Warning: Potential error, reading from uninitialized or invalid file pointer
+                                                           
+  fgets(buffer, sizeof(buffer), file);  // This could lead to undefined behavior                                                                                                                                    
+
+// Error: Trying to use the file pointer when it's NULL               
+
+printf("File content: %s\n", buffer); // This may result in undefined behavior
+
+    // Another common mistake: forget to close the file
+    fclose(file);  // No file opened, so this leads to an error
+
+    // Error handling for file creation
+    file = fopen("file.txt", "w");
+    if (file == NULL) {
+        // Critical error handling for file creation failure
+        perror("Error opening file for writing");
+        return 1;
+    }
+
+        }
+
+    // Writing to the file with proper error handling
+    fprintf(file, "Hello, World!\n");
+
+    // Forgetting to return value on successful program completion (warning)
+    ifclose(file);  // Proper file closure
+
+    return 0;
+}
+
+--------------------------------------------------------------------------------------
+Correct Code:
+
+#include <stdio.h>
+
+
+int main() {
+    FILE *file;
+    char buffer[100];
+
+    // Attempt to open a file in read mode (the file does not exist)
+    file = fopen("file.txt", "r");
+    if (file == NULL) {
+        // Warning: File opening failed but we continue
+        printf("Error: Could not open file.\n");
+        // Exit if the file cannot be opened
+        return 1;
+    }
+
+    // Reading from the file pointer only if file is successfully opened
+    if (fgets(buffer, sizeof(buffer), file) != NULL) {
+        // Printing the content only if reading is successful
+        printf("File content: %s\n", buffer);
+    } else {
+        printf("Error: Could not read from file.\n");
+    }
+
+    // Closing the file
+    fclose(file);
+
+    // Error handling for file creation
+    file = fopen("file.txt", "w");
+    if (file == NULL) {
+        // Critical error handling for file creation failure
+        perror("Error opening file for writing");
+        return -1;
+    }
+ // Writing to the file with proper error handling
+    fprintf(file, "Hello, World!\n");
+
+    // Proper file closure
+    fclose(file);
+
+    // Successful program completion
+    return 0;
+}
+
+
+
+------------------------------------------------------------------------
